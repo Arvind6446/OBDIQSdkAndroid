@@ -2,7 +2,6 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("maven-publish")
-    id("com.gradleup.shadow")
 }
 
 android {
@@ -62,6 +61,9 @@ publishing {
         }
     }
 }
+
+
+
 
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
