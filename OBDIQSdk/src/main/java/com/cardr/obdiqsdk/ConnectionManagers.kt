@@ -125,11 +125,12 @@ class ConnectionManager(
         // connectToRepairClubDevices()
     }
 
-    public fun initialize(context: Context){
+    public fun initialize(context: Context):String{
         repairClubManager = RepairClubManager.getInstance()
         repairClubManager?.initialize(context)
         repairClubManager?.configureSDK(BuildConfig.SDK_KEY,"OBDIQ ULTRA SDK",BuildConfig.SDK_VERSION,"")
         connectToRepairClubDevices()
+        return repairClubManager?.repairClubSDKVersion ?: ""
     }
 
     fun registerDisconnectionHandler(handler: () -> Unit) {
