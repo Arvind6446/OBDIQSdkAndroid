@@ -129,6 +129,7 @@ class ConnectionManager(
         repairClubManager = RepairClubManager.getInstance()
         repairClubManager?.initialize(context)
         repairClubManager?.configureSDK(BuildConfig.SDK_KEY,"OBDIQ ULTRA SDK",BuildConfig.SDK_VERSION,"")
+        connectToRepairClubDevices()
     }
 
     fun registerDisconnectionHandler(handler: () -> Unit) {
@@ -197,6 +198,7 @@ class ConnectionManager(
     }
 
     private fun startSelectDeviceTimer() {
+        println("startSelectDeviceTimer ")
         Handler(Looper.getMainLooper()).postDelayed({
             selectAndConnectToClosestDevice()
         }, 1000)
@@ -209,6 +211,7 @@ class ConnectionManager(
         }
 
         val closestDevice = foundDevices.minByOrNull { it.rssi } // Chooses lowest RSSI
+        println("closestDevice "+closestDevice)
         closestDevice?.blePeripheral?.let { blePeripheral ->
             repairClubManager?.connectTo(closestDevice) { connectionEntry, connectionStage, connectionState ->
                 repairClubManager?.stopScanning()
@@ -278,6 +281,16 @@ class ConnectionManager(
 
             ConnectionStage.BUS_SYNCED_TO_CONFIG -> {
                 println("Connection:: busSyncedToConfig - $connectionState")
+                if (connectionState == ConnectionState.COMPLETED) {
+                    timer.cancel()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        startScan()
+                    }
+                } else {
+                    //MARK  Show Alert BLE fail
+                    //viewModel.showMessageDialog("lease remove and reinsert the adapter in the vehicle OBD port; ensuring the device is fully inserted and the engine is running.")
+                }
+
             }
 
             ConnectionStage.MIL_CHECKING -> {

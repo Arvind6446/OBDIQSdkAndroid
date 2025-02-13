@@ -48,7 +48,7 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 groupId = "com.github.Arvind6446"
-                artifactId = "obdiqsdk"
+                artifactId = "OBDIQSdk"
                 version = "1.0.0"
 
                 // Automatically locate AAR artifact
