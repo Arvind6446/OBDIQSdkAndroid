@@ -9,8 +9,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 26
-
+        minSdk = 28
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "SDK_KEY", "\"1feddf76-3b99-4c4b-869a-74046daa3e30\"")
@@ -20,10 +19,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
 
@@ -32,47 +27,82 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
-
-
-
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            groupId = "com.cardr.obdiqsdk"
-            artifactId = "OBDIQSdk"
-            version = "1.0.0"
-            artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
-
-            // Add the shadow JAR as the artifact to be published
-        }
-    }
-
-    repositories {
-        maven {
-            url = uri("https://jitpack.io")
-        }
-    }
-}
-
-
-
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    testImplementation("junit:junit:4.13.2")
-    api("com.github.RRCummins:RepairClubAndroidSDK:1.2.21")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    implementation(platform("androidx.compose:compose-bom:2024.01.00"))
-    implementation("androidx.compose.material3:material3")
+    api(platform("androidx.compose:compose-bom:2024.01.00")) // ✅ BOM for Compose
+    api("androidx.compose.material3:material3:1.3.1") // ✅ Stable version
+    api("com.github.RRCummins:RepairClubAndroidSDK:1.2.21") // ✅ Ensure it is correct
+}
+
+// ✅ Maven Publishing
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = "com.github.Arvind6446"
+                artifactId = "obdiqsdk"
+                version = "1.0.0"
+
+                // Automatically locate AAR artifact
+                artifact("$buildDir/outputs/aar/${artifactId}-release.aar") {
+                    extension = "aar"
+                }
+
+                pom {
+                    name.set("OBDIQsdk")
+                    description.set("Android SDK for OBDIQsdk")
+                    url.set("https://github.com/Arvind6446/OBDIQSdkAndroid")
+
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("https://opensource.org/licenses/MIT")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set("Arvind6446")
+                            name.set("Arvind6446")
+                            email.set("gomax6446@gmail.com")
+                        }
+                    }
+
+                    scm {
+                        connection.set("scm:git:git://github.com/Arvind6446/OBDIQSdkAndroid.git")
+                        developerConnection.set("scm:git:ssh://github.com/Arvind6446/OBDIQSdkAndroid.git")
+                        url.set("https://github.com/Arvind6446/OBDIQSdkAndroid")
+                    }
+
+                    withXml {
+                        val dependenciesNode = asNode().appendNode("dependencies")
+
+                        // Adding dependencies manually
+                        fun addDependency(group: String, artifact: String, version: String) {
+                            val dependencyNode = dependenciesNode.appendNode("dependency")
+                            dependencyNode.appendNode("groupId", group)
+                            dependencyNode.appendNode("artifactId", artifact)
+                            dependencyNode.appendNode("version", version)
+                        }
+
+                        addDependency("androidx.compose.material3", "material3", "1.3.1")
+                        addDependency("com.github.RRCummins", "RepairClubAndroidSDK", "1.2.21")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ✅ Register "install" task correctly
+tasks.register("install") {
+    dependsOn("publishReleasePublicationToMavenLocal")
 }

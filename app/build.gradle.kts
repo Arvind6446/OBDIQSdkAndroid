@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.cardr.obdiqsdk"
-        minSdk = 25
+        minSdk = 28
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -43,11 +43,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+
 }
 
 dependencies {
@@ -67,4 +63,5 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
 }

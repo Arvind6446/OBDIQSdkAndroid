@@ -1,0 +1,2 @@
+-keep class com.repairclub.repaircludsdk.** { *; }
+-keep class com.repairclub.** { *; }
